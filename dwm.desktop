@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=dwm
+Encoding=UTF-8
+Type=XSession
+Exec=/home/yvesmo/bin/dwm/dwm-run
+TryExec=/home/yvesmo/bin/dwm/dwm-run
+DesktopNames=dwm
+Comment=Dynamic Window manager
+Type=Application
+X-Ubuntu-Gettext-Domain=dwm-6.2

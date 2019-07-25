@@ -1,0 +1,23 @@
+#!/bin/sh
+# relaunch DWM if the binary changes, otherwise bail
+csum=$(sha1sum $(which dwm))
+new_csum=""
+while true
+do
+    if [ "$csum" != "$new_csum" ]
+    then
+        csum=$new_csum
+
+        # screen config
+        xrandr --output DVI-I-1 --auto --output VGA-1 --left-of DVI-I-1 --auto
+        # status bar
+        dwmstatus &
+        # dwm startup
+        dwm 2> /home/yvesmo/bin/dwm/dwm.log
+    else
+        exit 0
+    fi
+    new_csum=$(sha1sum $(which dwm))
+    sleep 0.5
+done
+sleep 60
