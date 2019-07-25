@@ -5,7 +5,7 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
+static char *font = "mono:pixelsize=14:antialias=true:autohint=true";
 static int borderpx = 2;
 
 /*
@@ -30,7 +30,7 @@ static float chscale = 1.0;
 /*
  * word delimiter string
  *
- * More advanced example: " `'\"()[]{}"
+ * More advanced example: L" `'\"()[]{}"
  */
 char *worddelimiters = " ";
 
@@ -86,22 +86,22 @@ unsigned int tabspaces = 8;
 static const char *colorname[] = {
 	/* 8 normal colors */
 	"black",
-	"red3",
-	"green3",
-	"yellow3",
-	"blue2",
-	"magenta3",
-	"cyan3",
-	"gray90",
+	"#705050",
+	"#60b48a",
+	"#dfaf8f",
+	"#9ab8d7",
+	"#dc8cc3",
+	"#8cd0d3",
+	"#dcdccc",
 
 	/* 8 bright colors */
-	"gray50",
-	"red",
-	"green",
-	"yellow",
-	"#5c5cff",
-	"magenta",
-	"cyan",
+	"#709080",
+	"#dca3a3",
+	"#72d5a3",
+	"#f0dfaf",
+	"#94bff3",
+	"#ec93d3",
+	"#67a9e3",
 	"white",
 
 	[255] = 0,
