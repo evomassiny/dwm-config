@@ -1,3 +1,3 @@
 #!/bin/bash
-~/Pictures/screenshots/
+mkdir -p ~/Pictures/screenshots/
 maim -s > ~/Pictures/screenshots/$(date +%s).png
