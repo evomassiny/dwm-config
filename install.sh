@@ -38,4 +38,5 @@ sudo cp $BASE_DIR/dwm.desktop /usr/share/xsessions/dwm.desktop
 # * mupdf: pdf viewer
 # * maim: screenshot utility
 # * sxiv: image viewer
-sudo apt install mupdf sxiv maim
+# * pavucontrol: sound I/O manager for pulseaudio
+sudo apt install mupdf sxiv maim pavucontrol
