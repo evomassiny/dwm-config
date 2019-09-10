@@ -1,12 +1,11 @@
 st - simple terminal
 --------------------
-st is a simple terminal emulator for X which sucks less.
-
+This is a fork of [charlesdaniels'](https://github.com/charlesdaniels/st) fork of [st](https://st.suckless.org/).
+Thanks to *charlesdaniels* and [saitoha](https://gist.github.com/saitoha/70e0fdf22e3e8f63ce937c7f7da71809) it supports sixels graphics.
 
 Requirements
 ------------
 In order to build st you need the Xlib header files.
-
 
 Installation
 ------------
@@ -27,8 +26,4 @@ the st terminfo entry with the following command:
     tic -sx st.info
 
 See the man page for additional details.
-
-Credits
--------
-Based on Aurélien APTEL <aurelien dot aptel at gmail dot com> bt source code.
 
