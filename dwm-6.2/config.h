@@ -1,6 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 // other mapping
 #define CODE_return 36
+#define CODE_backspace 22
 #define CODE_tab 23
 #define CODE_space 65
 #define CODE_comma 58
@@ -78,7 +79,6 @@ static const Rule rules[] = {
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
 };
 
 /* layout(s) */
@@ -108,6 +108,8 @@ static const Layout layouts[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "st", NULL };
+/* USER defined commands */
+static const char *browser_cmd[]  = { "firefox", NULL };
 // sound command
 static const char *up_vol[]   = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%", NULL };
 static const char *down_vol[] = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%", NULL };
@@ -117,6 +119,7 @@ static const char *screenshot[] = { "/home/yvesmo/bin/dwm/dwm-6.2/scripts/take_s
 static Key keys[] = {
 	/* modifier             key    function        argument */
 	{ MODKEY|ShiftMask,     CODE_return,    spawn,          {.v = termcmd } },
+	{ MODKEY|ShiftMask,     CODE_backspace, spawn,          {.v = browser_cmd } },
 	{ MODKEY,               CODE_p,         spawn,          {.v = dmenucmd } },
 	{ MODKEY,               CODE_b,         togglebar,      {0} },
 	{ MODKEY,               CODE_j,         focusstack,     {.i = +1 } },
