@@ -9,7 +9,7 @@ do
         csum=$new_csum
 
         # screen config
-        xrandr --output DVI-I-1 --auto --output VGA-1 --left-of DVI-I-1 --auto
+        xrandr --output DVI-I-1 --auto --output DP-1 --left-of DVI-I-1 --auto
         # status bar
         dwmstatus &
         # dwm startup
