@@ -118,9 +118,9 @@ static const char *up_vol[]   = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", 
 static const char *down_vol[] = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%", NULL };
 static const char *screenshot[] = { "/home/yvesmo/bin/dwm/dwm-6.2/scripts/take_screenshot.sh", NULL };
 // spotify commands
-static const char *pause_song[] = {"dbus-send", "--print-reply", "--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause"};
-static const char *next_song[] = {"dbus-send", "--print-reply", "--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next"};
-static const char *previous_song[] = {"dbus-send", "--print-reply", "--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous"};
+static const char *pause_song[] = {"dbus-send", "--print-reply", "--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.PlayPause", NULL};
+static const char *next_song[] = {"dbus-send", "--print-reply", "--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.Next", NULL};
+static const char *previous_song[] = {"dbus-send", "--print-reply", "--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.Previous", NULL};
 
 
 /* key bindings */
