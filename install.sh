@@ -39,4 +39,5 @@ sudo cp $BASE_DIR/dwm.desktop /usr/share/xsessions/dwm.desktop
 # * maim: screenshot utility
 # * sxiv: image viewer
 # * pavucontrol: sound I/O manager for pulseaudio
-sudo apt install mupdf sxiv maim pavucontrol
+# * firejail for isolation
+sudo apt install mupdf sxiv maim pavucontrol firejail

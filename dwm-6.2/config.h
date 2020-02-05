@@ -9,6 +9,9 @@
 #define CODE_pageup 112
 #define CODE_pagedown 117
 #define CODE_screencap 107
+#define CODE_left_arrow 113
+#define CODE_right_arrow 114
+#define CODE_end 115
 
 // Main Numbers (not the actual numbers but the keys with them) 
 #define CODE_0 19
@@ -114,6 +117,11 @@ static const char *browser_cmd[]  = { "firefox", NULL };
 static const char *up_vol[]   = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%", NULL };
 static const char *down_vol[] = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%", NULL };
 static const char *screenshot[] = { "/home/yvesmo/bin/dwm/dwm-6.2/scripts/take_screenshot.sh", NULL };
+// spotify commands
+static const char *pause_song[] = {"dbus-send", "--print-reply", "--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause"};
+static const char *next_song[] = {"dbus-send", "--print-reply", "--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next"};
+static const char *previous_song[] = {"dbus-send", "--print-reply", "--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous"};
+
 
 /* key bindings */
 static Key keys[] = {
@@ -160,6 +168,10 @@ static Key keys[] = {
 	TAGKEYS(                CODE_7,                    6)
 	TAGKEYS(                CODE_8,                    7)
 	TAGKEYS(                CODE_9,                    8)
+        // Spotify commands
+	{ MODKEY,               CODE_end,           spawn,  {.v = pause_song} },
+	{ MODKEY,               CODE_left_arrow,    spawn,  {.v = previous_song} },
+	{ MODKEY,               CODE_right_arrow,   spawn,  {.v = next_song} },
 };
 
 
