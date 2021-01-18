@@ -59,9 +59,22 @@
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
 enum { SchemeNorm, SchemeSel }; /* color schemes */
-enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
-       NetWMFullscreen, NetActiveWindow, NetWMWindowType,
-       NetWMWindowTypeDialog, NetClientList, NetLast }; /* EWMH atoms */
+// NetWMStateSkipTaskBar: support _NET_WM_STATE_SKIP_TASKBAR window kind 
+// (like "microsoft teams" pop up notification windows)
+// see: https://specifications.freedesktop.org/wm-spec/wm-spec-latest.html
+enum { 
+    NetSupported,
+    NetWMName,
+    NetWMState,
+    NetWMCheck,
+    NetWMFullscreen,
+    NetActiveWindow,
+    NetWMWindowType,
+    NetWMWindowTypeDialog,
+    NetWMStateSkipTaskBar,
+    NetClientList,
+    NetLast
+}; /* EWMH atoms */ 
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
@@ -242,6 +255,7 @@ static int bh, blw = 0;      /* bar geometry */
 static int lrpad;            /* sum of left and right padding for text */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
+// mapping X event type to handler functions
 static void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
 	[ClientMessage] = clientmessage,
@@ -262,10 +276,13 @@ static Atom wmatom[WMLast], netatom[NetLast];
 static int running = 1;
 static Cur *cursor[CurLast];
 static Clr **scheme;
+// "dpy" stands for "display",
+// it is the main connection handle to the X11 server 
 static Display *dpy;
 static Drw *drw;
 static Monitor *mons, *selmon;
 static Window root, wmcheckwin;
+static FILE * log_file;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -490,6 +507,11 @@ cleanup(void)
 	XSync(dpy, False);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 	XDeleteProperty(dpy, root, netatom[NetActiveWindow]);
+
+        /* setup logging */
+        if (LOG_FILE != NULL && log_file != NULL) {
+            fclose(log_file);
+        }
 }
 
 void
@@ -951,7 +973,7 @@ grabkeys(void)
 	{
 		unsigned int i, j;
 		unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
-		KeyCode code;
+		/*KeyCode code;*/
 
 		XUngrabKey(dpy, AnyKey, AnyModifier, root);
 		for (i = 0; i < LENGTH(keys); i++)
@@ -1053,6 +1075,8 @@ manage(Window w, XWindowAttributes *wa)
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
 	configure(c); /* propagates border_width, if size doesn't change */
+        // set as `floating` or `fullscreen` depending
+        // of c's state or type
 	updatewindowtype(c);
 	updatesizehints(c);
 	updatewmhints(c);
@@ -1369,15 +1393,76 @@ restack(Monitor *m)
 	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
+/**
+ * Log info about an XEvent into `LOG_FILE`.
+ */
+void
+log_event(XEvent* event) {
+    if (LOG_FILE == NULL || log_file == NULL)
+        return;
+    switch(event->type) {
+        case ButtonPress:
+            fprintf(log_file, "ButtonPress\n");
+            break;
+        case ClientMessage:
+            fprintf(log_file, "ClientMessage\n");
+            break;
+        case ConfigureRequest:
+            fprintf(log_file, "ConfigureRequest\n");
+            break;
+        case ConfigureNotify:
+            fprintf(log_file, "ConfigureNotify\n");
+            break;
+        case DestroyNotify:
+            fprintf(log_file, "DestroyNotify\n");
+            break;
+        case EnterNotify:
+            fprintf(log_file, "EnterNotify\n");
+            break;
+        case Expose:
+            fprintf(log_file, "Expose\n");
+            break;
+        case FocusIn:
+            fprintf(log_file, "FocusIn\n");
+            break;
+        case KeyPress:
+            fprintf(log_file, "KeyPress\n");
+            break;
+        case MappingNotify:
+            fprintf(log_file, "MappingNotify\n");
+            break;
+        case MapRequest:
+            fprintf(log_file, "MapRequest\n");
+            break;
+        case MotionNotify:
+            // do not log mouse moves
+            /*fprintf(log_file, "MotionNotify\n");*/
+            break;
+        case PropertyNotify:
+            fprintf(log_file, "PropertyNotify\n");
+            break;
+        case UnmapNotify:
+            fprintf(log_file, "UnmapNotify\n");
+            break;
+        default:
+            fprintf(log_file, "unknown event %d\n", (int) event->type);
+            break;
+    }
+    fflush(log_file);
+}
+
 void
 run(void)
 {
 	XEvent ev;
 	/* main event loop */
 	XSync(dpy, False);
-	while (running && !XNextEvent(dpy, &ev))
-		if (handler[ev.type])
+	while (running && !XNextEvent(dpy, &ev)) {
+		if (handler[ev.type]) {
+                        log_event(&ev); // log event
 			handler[ev.type](&ev); /* call handler */
+                }
+        }
 }
 
 void
@@ -1474,7 +1559,7 @@ setfullscreen(Client *c, int fullscreen)
 {
 	if (fullscreen && !c->isfullscreen) {
 		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
-			PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
+			PropModeReplace, (unsigned char*) &netatom[NetWMFullscreen], 1);
 		c->isfullscreen = 1;
 		c->oldstate = c->isfloating;
 		c->oldbw = c->bw;
@@ -1561,6 +1646,7 @@ setup(void)
 	netatom[NetWMFullscreen] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
 	netatom[NetWMWindowType] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False);
 	netatom[NetWMWindowTypeDialog] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
+        netatom[NetWMStateSkipTaskBar] = XInternAtom(dpy, "_NET_WM_STATE_SKIP_TASKBAR", False); // teams notfaction
 	netatom[NetClientList] = XInternAtom(dpy, "_NET_CLIENT_LIST", False);
 	/* init cursors */
 	cursor[CurNormal] = drw_cur_create(drw, XC_left_ptr);
@@ -1594,6 +1680,11 @@ setup(void)
 	XSelectInput(dpy, root, wa.event_mask);
 	grabkeys();
 	focus(NULL);
+
+        /* setup logging */
+        if (LOG_FILE != NULL) {
+            log_file = fopen(LOG_FILE, "a");
+        }
 }
 
 
@@ -1628,12 +1719,16 @@ showhide(Client *c)
 	}
 }
 
+/**
+ * Wait for all child process to terminate.
+ * Prevents zombie process.
+ */
 void
 sigchld(int unused)
 {
 	if (signal(SIGCHLD, sigchld) == SIG_ERR)
 		die("can't install SIGCHLD handler:");
-	while (0 < waitpid(-1, NULL, WNOHANG));
+	while (waitpid(-1, NULL, WNOHANG) > 0);
 }
 
 void
@@ -2001,6 +2096,10 @@ updatetitle(Client *c)
 		strcpy(c->name, broken);
 }
 
+/**
+ * Set Client as "floating" or "fullscreen"
+ * depending of its state or type.
+ */
 void
 updatewindowtype(Client *c)
 {
@@ -2010,6 +2109,9 @@ updatewindowtype(Client *c)
 	if (state == netatom[NetWMFullscreen])
 		setfullscreen(c, 1);
 	if (wtype == netatom[NetWMWindowTypeDialog])
+		c->isfloating = 1;
+        // set "teams notification" as floating
+	if (state == netatom[NetWMStateSkipTaskBar])
 		c->isfloating = 1;
 }
 

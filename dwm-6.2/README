@@ -46,3 +46,9 @@ Configuration
 -------------
 The configuration of dwm is done by creating a custom config.h
 and (re)compiling the source code.
+
+Patch / edits
+-------------
+This version differs slightly with the default implementation:
+* it sets `_NET_WM_STATE_SKIP_TASKBAR` X client as "floating" windows
+* it uses the `dwm-keycodes-6.1.diff` patch to support non-qwerty keyboard layouts.
