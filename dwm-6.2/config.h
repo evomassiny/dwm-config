@@ -54,8 +54,8 @@ static const Layout layouts[] = {
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
-//static char LOG_FILE[] = "/home/yvesmo/.dwm-log.log";
 static char * LOG_FILE = NULL;
+//static char LOG_FILE[] = "/home/yvesmo/.dwm-log.log";
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
@@ -118,6 +118,8 @@ static Key keys[] = {
 	TAGKEYS(                CODE_7,                    6)
 	TAGKEYS(                CODE_8,                    7)
 	TAGKEYS(                CODE_9,                    8)
+        {ShiftMask,             CODE_left_arrow,    move_focus_to_right_or_left_tag, {.i = -1}},
+        {ShiftMask,             CODE_right_arrow,   move_focus_to_right_or_left_tag, {.i = +1}},
         // Spotify commands
 	{ MODKEY,               CODE_end,           spawn,  {.v = pause_song} },
 	{ MODKEY,               CODE_left_arrow,    spawn,  {.v = previous_song} },

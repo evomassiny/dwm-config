@@ -54,6 +54,8 @@
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
+#define RIGHT_MOST_TAG           (1 << (LENGTH(tags) - 1))
+#define LEFT_MOST_TAG           1
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
 
 /* enums */
@@ -78,7 +80,7 @@ enum {
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
-
+// The values passed around key-binded functions
 typedef union {
 	int i;
 	unsigned int ui;
@@ -222,6 +224,7 @@ static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *);
 static void togglebar(const Arg *arg);
+static void move_focus_to_right_or_left_tag(const Arg *_arg);
 static void togglefloating(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
@@ -1827,6 +1830,29 @@ toggletag(const Arg *arg)
 		focus(NULL);
 		arrange(selmon);
 	}
+}
+
+/**
+ * Change the focus to the neighbour tag.
+ * * go to the next **right** tag if `arg->ui` > 0
+ * * go to the next **left** tag otherwise
+ */
+void
+move_focus_to_right_or_left_tag(const Arg* arg)
+{
+        // Arg struct, the 'ui' field will contains the new tag mask
+        Arg new;
+        // fetch the current selected tag (as a mask)
+	unsigned int old = selmon->tagset[selmon->seltags];
+        if (arg->i){
+            // move to right
+            new.ui = RIGHT_MOST_TAG & old ? LEFT_MOST_TAG : old << 1;
+        } else {
+            // move to left
+            new.ui = LEFT_MOST_TAG & old ? RIGHT_MOST_TAG : old >> 1;
+        }
+        // change focus to `new.ui` tag
+        view(&new);
 }
 
 void
