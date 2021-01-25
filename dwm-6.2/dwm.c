@@ -1844,7 +1844,7 @@ move_focus_to_right_or_left_tag(const Arg* arg)
         Arg new;
         // fetch the current selected tag (as a mask)
 	unsigned int old = selmon->tagset[selmon->seltags];
-        if (arg->i){
+        if (arg->i > 0){
             // move to right
             new.ui = RIGHT_MOST_TAG & old ? LEFT_MOST_TAG : old << 1;
         } else {
